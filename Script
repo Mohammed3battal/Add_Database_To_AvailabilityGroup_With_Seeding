@@ -1,0 +1,42 @@
+-- YOU MUST EXECUTE THIS SCRIPT IN SQLCMD MODE
+
+--====================================
+-- Step 1: Modify replicas to allow automatic seeding
+--====================================
+
+:Connect Primary
+
+USE [master]
+GO
+
+ALTER AVAILABILITY GROUP [AG_Name]
+MODIFY REPLICA ON N'Secondary-1' WITH (SEEDING_MODE = AUTOMATIC);
+GO
+
+ALTER AVAILABILITY GROUP [AG_Name]
+MODIFY REPLICA ON N'Secondary-2' WITH (SEEDING_MODE = AUTOMATIC);
+GO
+
+--====================================
+-- Step 2: Add the database to the Availability Group
+--====================================
+
+ALTER AVAILABILITY GROUP [AG_Name]
+ADD DATABASE [Database_Name];
+GO
+
+--====================================
+-- Step 3: Grant seeding permission on secondaries
+--====================================
+
+:Connect Seconary-1
+
+ALTER AVAILABILITY GROUP [AG_Name]
+GRANT CREATE ANY DATABASE;
+GO
+
+:Connect Seconary-2
+
+ALTER AVAILABILITY GROUP [AG_Name]
+GRANT CREATE ANY DATABASE;
+GO
